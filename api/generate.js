@@ -20,34 +20,130 @@ export default async function handler(req, res) {
   try {
     const { system, messages } = req.body;
 
+    const normalizeContent = (content) => {
+      if (typeof content === 'string') return content;
+
+      if (Array.isArray(content)) {
+        return content
+          .filter((part) => part?.type === 'text')
+          .map((part) => part.text || '')
+          .join('\n');
+      }
+
+      return '';
+    };
+
+    const extractGoogleDocIds = (text) => {
+      if (!text) return [];
+
+      const regex = /https?:\/\/docs\.google\.com\/document\/d\/([a-zA-Z0-9-_]+)/g;
+      const ids = [];
+      let match;
+
+      while ((match = regex.exec(text)) !== null) {
+        ids.push(match[1]);
+      }
+
+      return [...new Set(ids)];
+    };
+
+    const fetchGoogleDocText = async (docId) => {
+      const exportUrl = `https://docs.google.com/document/d/${docId}/export?format=txt`;
+
+      const response = await fetch(exportUrl, {
+        method: 'GET',
+        headers: {
+          'User-Agent': 'Mozilla/5.0'
+        }
+      });
+
+      const text = await response.text();
+
+      if (!response.ok) {
+        throw new Error('Não foi possível acessar o Google Docs.');
+      }
+
+      const lowerText = text.toLowerCase();
+
+      const looksBlocked =
+        lowerText.includes('sign in') ||
+        lowerText.includes('request access') ||
+        lowerText.includes('access denied') ||
+        lowerText.includes('você precisa de acesso') ||
+        lowerText.includes('solicitar acesso');
+
+      if (looksBlocked || text.trim().startsWith('<!DOCTYPE html')) {
+        throw new Error(
+          'O Google Docs não está público. Altere o compartilhamento para "qualquer pessoa com o link pode visualizar".'
+        );
+      }
+
+      return text.trim();
+    };
+
+    const allInputText = [
+      system || '',
+      ...(Array.isArray(messages)
+        ? messages.map((msg) => normalizeContent(msg?.content))
+        : [])
+    ].join('\n');
+
+    const googleDocIds = extractGoogleDocIds(allInputText);
+
+    let docsContext = '';
+
+    if (googleDocIds.length > 0) {
+      const docsTexts = [];
+
+      for (const docId of googleDocIds) {
+        try {
+          const docText = await fetchGoogleDocText(docId);
+
+          docsTexts.push(
+            `CONTEÚDO EXTRAÍDO DO GOOGLE DOCS:\n${docText.slice(0, 30000)}`
+          );
+        } catch (err) {
+          return res.status(400).json({
+            error: err.message
+          });
+        }
+      }
+
+      docsContext = docsTexts.join('\n\n---\n\n');
+    }
+
     const groqMessages = [];
 
     if (system) {
       groqMessages.push({
         role: 'system',
-        content: system
+        content: String(system)
+      });
+    }
+
+    if (docsContext) {
+      groqMessages.push({
+        role: 'system',
+        content:
+          'Use o conteúdo abaixo como contexto principal quando o usuário pedir análise, resumo ou reescrita do Google Docs.\n\n' +
+          docsContext
       });
     }
 
     if (Array.isArray(messages)) {
       for (const message of messages) {
-        let content = '';
+        const content = normalizeContent(message?.content);
 
-        if (typeof message?.content === 'string') {
-          content = message.content;
-        } else if (Array.isArray(message?.content)) {
-          content = message.content
-            .filter((part) => part.type === 'text')
-            .map((part) => part.text)
-            .join('\n');
-        }
+        if (!content.trim()) continue;
 
-        if (content.trim()) {
-          groqMessages.push({
-            role: message.role || 'user',
-            content
-          });
-        }
+        const role = ['user', 'assistant', 'system'].includes(message?.role)
+          ? message.role
+          : 'user';
+
+        groqMessages.push({
+          role,
+          content
+        });
       }
     }
 
@@ -64,7 +160,7 @@ export default async function handler(req, res) {
         Authorization: `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
+        model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
         messages: groqMessages,
         temperature: 0.7,
         max_completion_tokens: 2500
@@ -107,6 +203,7 @@ export default async function handler(req, res) {
         }
       ]
     });
+
   } catch (err) {
     return res.status(500).json({
       error: 'Erro de conexão: ' + err.message
