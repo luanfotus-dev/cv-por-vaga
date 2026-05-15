@@ -8,7 +8,7 @@ export default async function handler(req, res) {
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: 'Variável ANTHROPIC_API_KEY não configurada no Vercel.' });
+    return res.status(500).json({ error: 'ANTHROPIC_API_KEY não configurada no Vercel.' });
   }
 
   try {
@@ -28,11 +28,17 @@ export default async function handler(req, res) {
     try {
       data = JSON.parse(text);
     } catch {
-      return res.status(500).json({ error: 'Resposta inválida da Anthropic: ' + text.slice(0, 200) });
+      return res.status(500).json({ error: 'Resposta inválida: ' + text.slice(0, 300) });
     }
 
-    return res.status(response.status).json(data);
+    if (!response.ok) {
+      const msg = data?.error?.message || data?.error || JSON.stringify(data);
+      return res.status(response.status).json({ error: msg });
+    }
+
+    return res.status(200).json(data);
+
   } catch (err) {
-    return res.status(500).json({ error: 'Erro ao chamar Anthropic: ' + err.message });
+    return res.status(500).json({ error: 'Erro de conexão: ' + err.message });
   }
 }
