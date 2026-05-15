@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CV por Vaga</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f2f2f2;
+      --surface: #ffffff;
+      --border: #e4e4e4;
+      --border-focus: #a78bfa;
+      --text: #111111;
+      --text-2: #555555;
+      --text-3: #999999;
+      --accent: #7c3aed;
+      --accent-hover: #6d28d9;
+      --accent-light: #f3f0ff;
+      --success: #16a34a;
+      --success-light: #f0fdf4;
+      --error: #dc2626;
+      --radius-sm: 8px;
+      --radius: 12px;
+      --radius-lg: 16px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    }
+
+    body {
+      font-family: 'Geist', 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* NAV */
+    nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      height: 52px;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .logo {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    /* LAYOUT */
+    .page {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 32px 20px 80px;
+    }
+
+    /* HEADER */
+    .page-header {
+      margin-bottom: 28px;
+    }
+    .page-title {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .page-sub {
+      font-size: 14px;
+      color: var(--text-2);
+      line-height: 1.6;
+    }
+
+    /* SECTION */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .section-num {
+      width: 22px; height: 22px;
+      border-radius: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-2);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      flex: 1;
+    }
+    .section-optional {
+      font-size: 12px;
+      color: var(--text-3);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 3px;
+      gap: 2px;
+      margin-bottom: 14px;
+    }
+    .tab {
+      flex: 1;
+      padding: 6px 10px;
+      font-size: 13px;
+      font-weight: 400;
+      font-family: inherit;
+      color: var(--text-2);
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab.active {
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 500;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .tab:hover:not(.active) { color: var(--text); }
+
+    /* INPUTS */
+    textarea, input[type=text] {
+      width: 100%;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 13px;
+      resize: vertical;
+      line-height: 1.6;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+    }
+    textarea { min-height: 120px; }
+    textarea:focus, input[type=text]:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+    }
+    ::placeholder { color: var(--text-3); }
+
+    /* UPLOAD */
+    .upload-zone {
+      border: 1.5px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      background: var(--bg);
+      transition: all 0.15s;
+    }
+    .upload-zone:hover {
+      border-color: var(--border-focus);
+      background: var(--accent-light);
+    }
+    .upload-zone.has-file {
+      border-style: solid;
+      border-color: var(--success);
+      background: var(--success-light);
+    }
+    .upload-emoji { font-size: 26px; margin-bottom: 6px; }
+    .upload-label { font-size: 13px; color: var(--text-2); }
+    .upload-filename { font-size: 13px; color: var(--success); font-weight: 500; margin-top: 4px; }
+
+    /* HINT */
+    .hint {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 8px;
+      line-height: 1.6;
+    }
+    .hint a { color: var(--accent); text-decoration: none; }
+    .hint a:hover { text-decoration: underline; }
+
+    /* BUTTON */
+    .btn-submit {
+      width: 100%;
+      padding: 12px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      background: var(--accent);
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+      letter-spacing: -0.01em;
+      box-shadow: 0 1px 3px rgba(124,58,237,0.3);
+      margin-top: 4px;
+    }
+    .btn-submit:hover { background: var(--accent-hover); box-shadow: 0 4px 12px rgba(124,58,237,0.35); }
+    .btn-submit:active { transform: scale(0.99); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* STATUS */
+    .status-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      margin-top: 12px;
+      box-shadow: var(--shadow);
+      display: none;
+    }
+    .status-box.visible { display: block; }
+    .status-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .status-label { font-size: 12px; font-weight: 500; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.06em; }
+    .status-pct { font-size: 12px; color: var(--text-3); }
+    .progress {
+      height: 4px;
+      background: var(--bg);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 99px;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+    .status-msg { font-size: 13px; color: var(--text-2); }
+
+    /* RESULT */
+    .result-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-top: 12px;
+      box-shadow: var(--shadow);
+      display: none;
+    }
+    .result-box.visible { display: block; }
+    .result-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .result-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      flex: 1;
+      min-width: 100px;
+    }
+    .btn-dl {
+      padding: 6px 14px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-dl:hover { background: var(--accent-hover); }
+    .btn-copy {
+      padding: 6px 14px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-copy:hover { background: var(--border); }
+    .result-body {
+      padding: 20px;
+      font-size: 13.5px;
+      line-height: 1.8;
+      color: var(--text);
+      white-space: pre-wrap;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 520px) {
+      .page { padding: 20px 14px 60px; }
+      .section { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    CV por Vaga
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="page-header">
+    <h1 class="page-title">Adapte seu currículo para cada vaga</h1>
+    <p class="page-sub">Cole seu currículo e a descrição da vaga. A IA ajusta o conteúdo e destaca as palavras-chave certas.</p>
+  </div>
+
+  <!-- SEÇÃO 1: CURRÍCULO -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div class="section-title">Seu currículo</div>
+    </div>
+
+    <div class="tabs" id="cv-tabs">
+      <button class="tab active" onclick="switchCv('paste')">Colar texto</button>
+      <button class="tab" onclick="switchCv('pdf')">Enviar PDF</button>
+      <button class="tab" onclick="switchCv('link')">Google Docs</button>
+    </div>
+
+    <div id="cv-paste">
+      <textarea id="cv-text" placeholder="Cole aqui o texto completo do seu currículo..."></textarea>
+    </div>
+
+    <div id="cv-pdf" class="hidden">
+      <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+        <div class="upload-emoji">📄</div>
+        <div class="upload-label">Clique para selecionar o PDF do seu currículo</div>
+        <div class="upload-filename hidden" id="file-label"></div>
+      </div>
+      <input type="file" id="file-input" accept=".pdf" class="hidden" onchange="onFile(this)" />
+    </div>
+
+    <div id="cv-link" class="hidden">
+      <input type="text" id="cv-link-val" placeholder="https://docs.google.com/document/d/..." />
+      <p class="hint">O documento precisa ser público: <strong>Compartilhar → Qualquer pessoa com o link pode ver</strong>.</p>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 2: VAGA -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div class="section-title">Vaga</div>
+    </div>
+
+    <div class="tabs" id="job-tabs">
+      <button class="tab active" onclick="switchJob('desc')">Descrição</button>
+      <button class="tab" onclick="switchJob('link')">Link da vaga</button>
+    </div>
+
+    <div id="job-desc">
+      <textarea id="job-text" placeholder="Cole o título, requisitos e responsabilidades da vaga..."></textarea>
+    </div>
+
+    <div id="job-link" class="hidden">
+      <input type="text" id="job-link-val" placeholder="https://linkedin.com/jobs/view/..." />
+      <p class="hint">LinkedIn, Gupy, Indeed ou qualquer outra plataforma.</p>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 3: PREFERÊNCIAS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div class="section-title">Preferências</div>
+      <span class="section-optional">opcional</span>
+    </div>
+    <textarea id="prefs" placeholder="Ex: destacar liderança, manter em uma página, tom mais formal, focar em Python..." style="min-height: 72px;"></textarea>
+  </div>
+
+  <button class="btn-submit" id="btn" onclick="run()">Adaptar currículo</button>
+
+  <!-- STATUS -->
+  <div class="status-box" id="status-box">
+    <div class="status-top">
+      <span class="status-label">Processando</span>
+      <span class="status-pct" id="status-pct">0%</span>
+    </div>
+    <div class="progress"><div class="progress-fill" id="prog"></div></div>
+    <div class="status-msg" id="status-msg">Iniciando...</div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div class="result-box" id="result-box">
+    <div class="result-header">
+      <span class="result-title" id="result-title">Currículo adaptado</span>
+      <button class="btn-copy" onclick="doCopy()">Copiar</button>
+      <button class="btn-dl" onclick="doPDF()">↓ Baixar PDF</button>
+    </div>
+    <div class="result-body" id="result-body"></div>
+  </div>
+
+</div>
+
+<script>
+  let cvMode = 'paste', jobMode = 'desc';
+  let pdfB64 = null, output = '';
+
+  function switchCv(mode) {
+    cvMode = mode;
+    ['paste','pdf','link'].forEach((m, i) => {
+      document.getElementById('cv-' + m).classList.toggle('hidden', m !== mode);
+      document.getElementById('cv-tabs').children[i].classList.toggle('active', m === mode);
+    });
+  }
+
+  function switchJob(mode) {
+    jobMode = mode;
+    document.getElementById('job-desc').classList.toggle('hidden', mode !== 'desc');
+    document.getElementById('job-link').classList.toggle('hidden', mode !== 'link');
+    document.getElementById('job-tabs').children[0].classList.toggle('active', mode === 'desc');
+    document.getElementById('job-tabs').children[1].classList.toggle('active', mode === 'link');
+  }
+
+  function onFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+    document.getElementById('drop-zone').classList.add('has-file');
+    const lbl = document.getElementById('file-label');
+    lbl.textContent = '✓ ' + file.name;
+    lbl.classList.remove('hidden');
+    document.querySelector('#drop-zone .upload-label').textContent = 'PDF carregado';
+    const r = new FileReader();
+    r.onload = e => { pdfB64 = e.target.result.split(',')[1]; };
+    r.readAsDataURL(file);
+  }
+
+  function setProgress(pct, msg) {
+    document.getElementById('prog').style.width = pct + '%';
+    document.getElementById('status-pct').textContent = pct + '%';
+    document.getElementById('status-msg').textContent = msg;
+  }
+
+  async function run() {
+    // Validar currículo
+    let cvContent = '';
+    if (cvMode === 'paste') {
+      cvContent = document.getElementById('cv-text').value.trim();
+      if (!cvContent) { alert('Cole o texto do seu currículo.'); return; }
+    } else if (cvMode === 'pdf') {
+      if (!pdfB64) { alert('Selecione o PDF do seu currículo.'); return; }
+    } else {
+      cvContent = document.getElementById('cv-link-val').value.trim();
+      if (!cvContent) { alert('Informe o link do Google Docs.'); return; }
+    }
+
+    // Validar vaga
+    let jobContent = '';
+    if (jobMode === 'desc') {
+      jobContent = document.getElementById('job-text').value.trim();
+      if (!jobContent) { alert('Cole a descrição da vaga.'); return; }
+    } else {
+      jobContent = document.getElementById('job-link-val').value.trim();
+      if (!jobContent) { alert('Informe o link da vaga.'); return; }
+    }
+
+    const prefs = document.getElementById('prefs').value.trim();
+    const btn = document.getElementById('btn');
+    const statusBox = document.getElementById('status-box');
+    const resultBox = document.getElementById('result-box');
+
+    btn.disabled = true;
+    btn.textContent = 'Processando...';
+    statusBox.classList.add('visible');
+    resultBox.classList.remove('visible');
+    setProgress(10, 'Enviando para a IA...');
+
+    const system = `Você é especialista em RH e redação de currículos. Adapte o currículo para a vaga específica.
+
+Regras:
+- NUNCA invente experiências ou habilidades
+- Reordene seções priorizando o relevante para a vaga
+- Reescreva o resumo/objetivo para o cargo
+- Use palavras-chave da vaga naturalmente
+- Separe seções com "---"
+- Comece com nome e contatos
+- Retorne APENAS o currículo, sem comentários`;
+
+    const prompt = `CURRÍCULO:\n${cvMode === 'pdf' ? '[PDF anexado]' : cvMode === 'link' ? `[Google Docs: ${cvContent}]` : cvContent}\n\nVAGA:\n${jobMode === 'link' ? `[Link: ${jobContent}]` : jobContent}${prefs ? `\n\nPREFERÊNCIAS:\n${prefs}` : ''}`;
+
+    let msgContent = prompt;
+    if (cvMode === 'pdf' && pdfB64) {
+      msgContent = [
+        { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: pdfB64 } },
+        { type: 'text', text: prompt }
+      ];
+    }
+
+    try {
+      setProgress(40, 'Analisando currículo e vaga...');
+
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 2500,
+          system,
+          messages: [{ role: 'user', content: msgContent }]
+        })
+      });
+
+      setProgress(80, 'Finalizando...');
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || `Erro ${res.status}`);
+
+      output = data.content?.filter(b => b.type === 'text').map(b => b.text).join('\n') || '';
+      if (!output) throw new Error('Resposta vazia. Tente novamente.');
+
+      setProgress(100, 'Currículo adaptado com sucesso!');
+      document.getElementById('result-body').textContent = output;
+      document.getElementById('result-title').textContent = 'Currículo adaptado — ' + jobContent.slice(0, 40).replace(/\n/g,' ') + '...';
+
+      setTimeout(() => {
+        resultBox.classList.add('visible');
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 300);
+
+    } catch (err) {
+      setProgress(0, '❌ ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Adaptar currículo';
+    }
+  }
+
+  function doCopy() {
+    if (!output) return;
+    navigator.clipboard.writeText(output).then(() => {
+      const b = event.currentTarget;
+      const o = b.textContent;
+      b.textContent = 'Copiado!';
+      setTimeout(() => b.textContent = o, 2000);
+    });
+  }
+
+  function doPDF() {
+    if (!output) return;
+    const lines = output.split('\n');
+    let body = '';
+    for (const line of lines) {
+      const t = line.trim();
+      if (t === '---') body += '<hr>';
+      else if (!t) body += '<div style="height:6px"></div>';
+      else if (t === t.toUpperCase() && t.length > 2 && t.length < 60) body += `<h2>${t}</h2>`;
+      else if (/^[-•]/.test(t)) body += `<li>${t.replace(/^[-•]\s*/,'')}</li>`;
+      else body += `<p>${line}</p>`;
+    }
+    const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Currículo</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Geist',sans-serif;max-width:700px;margin:0 auto;padding:48px;color:#111;font-size:13.5px;line-height:1.75}
+h2{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#666;margin:22px 0 8px;padding-bottom:5px;border-bottom:1px solid #e4e4e4}
+p{margin:3px 0}li{margin:3px 0 3px 18px}hr{border:none;border-top:1px solid #e4e4e4;margin:16px 0}
+@media print{body{padding:0}@page{margin:2cm}}
+</style></head><body>${body}<script>window.onload=()=>setTimeout(()=>window.print(),200)<\/script></body></html>`;
+    const url = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+    const w = window.open(url, '_blank');
+    if (!w) { const a = document.createElement('a'); a.href=url; a.download='curriculo.html'; a.click(); }
+    setTimeout(()=>URL.revokeObjectURL(url), 10000);
+  }
+</script>
+</body>
+</html>
